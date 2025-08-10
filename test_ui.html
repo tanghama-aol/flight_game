@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>界面切换测试</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .test-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #00ffff;
+        }
+        
+        .test-button {
+            background: #00ffff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .test-button:hover {
+            background: #66ffff;
+        }
+        
+        .status {
+            margin-top: 10px;
+            color: #ffff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-controls">
+        <h3>界面切换测试</h3>
+        <button class="test-button" onclick="testShowStart()">显示开始界面</button>
+        <button class="test-button" onclick="testShowGame()">显示游戏界面</button>
+        <button class="test-button" onclick="testShowGameOver()">显示结束界面</button>
+        <button class="test-button" onclick="checkScreens()">检查界面状态</button>
+        <div class="status" id="status">点击按钮测试界面切换</div>
+    </div>
+
+    <!-- 游戏容器 -->
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <!-- 开始界面 -->
+        <div id="startScreen" class="ui-overlay screen active">
+            <h1>弹幕大战 - 开始界面</h1>
+            <p>这是开始界面</p>
+        </div>
+
+        <!-- 游戏HUD -->
+        <div id="gameHud" class="ui-overlay screen">
+            <div>分数: 0</div>
+            <div>生命: ❤️❤️❤️</div>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div id="gameOverScreen" class="ui-overlay screen">
+            <h2>游戏结束界面</h2>
+            <p>这是游戏结束界面</p>
+        </div>
+    </div>
+
+    <style>
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameCanvas {
+            border: 2px solid #00ffff;
+            background: linear-gradient(180deg, #001122 0%, #000044 100%);
+        }
+
+        .ui-overlay {
+            position: absolute;
+            z-index: 10;
+        }
+
+        .screen {
+            display: none !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: flex !important;
+        }
+
+        #startScreen {
+            background: linear-gradient(45deg, #001122, #000044, #220011);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+        }
+
+        #gameHud {
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: transparent;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        #gameOverScreen {
+            background: rgba(0, 0, 0, 0.9);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+        }
+    </style>
+
+    <script>
+        function showScreen(screenId) {
+            console.log(`Attempting to show screen: ${screenId}`);
+            
+            // 首先隐藏所有界面
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+                screen.style.display = 'none';
+                console.log(`Hiding screen: ${screen.id}`);
+            });
+            
+            // 然后显示指定界面
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                targetScreen.style.display = 'flex';
+                console.log(`Showing screen: ${screenId}`);
+                
+                updateStatus(`当前显示: ${screenId}`);
+            } else {
+                console.error(`Screen not found: ${screenId}`);
+                updateStatus(`错误: 找不到界面 ${screenId}`);
+            }
+        }
+        
+        function testShowStart() {
+            showScreen('startScreen');
+        }
+        
+        function testShowGame() {
+            showScreen('gameHud');
+        }
+        
+        function testShowGameOver() {
+            showScreen('gameOverScreen');
+        }
+        
+        function checkScreens() {
+            const screens = document.querySelectorAll('.screen');
+            let status = '界面状态:\n';
+            
+            screens.forEach(screen => {
+                const isVisible = screen.classList.contains('active');
+                const display = window.getComputedStyle(screen).display;
+                status += `${screen.id}: ${isVisible ? '激活' : '隐藏'} (display: ${display})\n`;
+            });
+            
+            console.log(status);
+            updateStatus(status);
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML = message.replace(/\n/g, '<br>');
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Test page loaded');
+            checkScreens();
+        });
+    </script>
+</body>
+</html>

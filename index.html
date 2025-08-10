@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>弹幕大战 - 星际穿越</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameCanvas {
+            border: 2px solid #00ffff;
+            background: linear-gradient(180deg, #001122 0%, #000044 100%);
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        .ui-overlay {
+            position: absolute;
+            z-index: 10;
+        }
+
+        #startScreen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #001122, #000044, #220011);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+        }
+
+        #gameTitle {
+            font-size: 4em;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff;
+            margin-bottom: 1em;
+            animation: pulse 2s infinite;
+        }
+
+        #gameSubtitle {
+            font-size: 1.5em;
+            color: #ffaa00;
+            margin-bottom: 2em;
+            text-shadow: 0 0 10px #ffaa00;
+        }
+
+        .menu-button {
+            background: linear-gradient(45deg, #00ffff, #0099cc);
+            border: 2px solid #00ffff;
+            color: #000;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .menu-button:hover {
+            background: linear-gradient(45deg, #00ccff, #0088aa);
+            box-shadow: 0 0 20px #00ffff;
+            transform: scale(1.1);
+        }
+
+        #gameHud {
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 1.2em;
+            font-weight: bold;
+            background: transparent;
+            flex-direction: row;
+            height: auto;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        #score, #lives, #level {
+            background: rgba(0, 255, 255, 0.2);
+            padding: 10px 20px;
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        #gameOverScreen {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+        }
+
+        #finalScore {
+            font-size: 3em;
+            color: #ff0088;
+            text-shadow: 0 0 20px #ff0088;
+            margin-bottom: 1em;
+        }
+
+        #leaderboard {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px;
+            min-width: 400px;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .screen {
+            display: none !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        .screen.active {
+            display: flex !important;
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #cccccc;
+            font-size: 1em;
+        }
+
+        .instruction-line {
+            margin: 5px 0;
+        }
+
+        #powerUpIndicator {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 0, 0.2);
+            border: 1px solid #ffff00;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .instruction-section {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .instruction-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        #gamepadStatus {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 255, 255, 0.2);
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            z-index: 100;
+            display: none;
+        }
+
+        #gamepadStatus.connected {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+            display: block;
+        }
+
+        #gamepadStatus.disconnected {
+            background: rgba(255, 255, 0, 0.2);
+            border-color: #ffff00;
+            display: block;
+        }
+
+        .gamepad-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .gamepad-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 0.8em;
+            display: none;
+        }
+
+        .gamepad-controls.show {
+            display: block;
+        }
+
+        .control-hint {
+            display: flex;
+            align-items: center;
+            margin: 3px 0;
+        }
+
+        .control-button {
+            display: inline-block;
+            background: #333;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 8px;
+            font-size: 0.7em;
+            min-width: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <!-- 开始界面 -->
+        <div id="startScreen" class="ui-overlay screen active">
+            <h1 id="gameTitle">弹幕大战</h1>
+            <h2 id="gameSubtitle">星际穿越</h2>
+            <button id="startButton" class="menu-button">开始游戏</button>
+            <button id="leaderboardButton" class="menu-button">排行榜</button>
+            <button id="instructionsButton" class="menu-button">游戏说明</button>
+            <button id="gamepadSettingsButton" class="menu-button" style="display: none;">🎮 手柄设置</button>
+            
+            <div id="instructions">
+                <div class="instruction-section">
+                    <div class="instruction-title">⌨️ 键盘/鼠标操作</div>
+                    <div class="instruction-line">🎮 使用 WASD 或方向键移动飞机</div>
+                    <div class="instruction-line">🔫 按住空格键或点击鼠标射击</div>
+                    <div class="instruction-line">⏸️ 按 ESC 或 P 键暂停游戏</div>
+                </div>
+                
+                <div class="instruction-section">
+                    <div class="instruction-title">🎮 手柄操作</div>
+                    <div class="instruction-line">🕹️ 左摇杆或方向键移动飞机</div>
+                    <div class="instruction-line">🔫 X/Square 或 扳机键射击</div>
+                    <div class="instruction-line">⏸️ Start/Options 键暂停游戏</div>
+                    <div class="instruction-line">🎯 A/Cross 键确认，B/Circle 键返回</div>
+                    <div class="instruction-line">📳 支持震动反馈效果</div>
+                </div>
+                
+                <div class="instruction-section">
+                    <div class="instruction-line">💎 收集道具获得强化</div>
+                    <div class="instruction-line">⭐ 击败敌机获得分数</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏HUD -->
+        <div id="gameHud" class="ui-overlay screen">
+            <div id="score">分数: 0</div>
+            <div id="level">关卡: 1</div>
+            <div id="lives">生命: ❤️❤️❤️</div>
+        </div>
+
+        <!-- 道具指示器 -->
+        <div id="powerUpIndicator" class="ui-overlay">
+            <div id="powerUpText"></div>
+            <div id="powerUpTimer"></div>
+        </div>
+
+        <!-- 手柄状态指示器 -->
+        <div id="gamepadStatus">
+            🎮 手柄已连接
+        </div>
+
+        <!-- 手柄控制提示 -->
+        <div id="gamepadControls" class="gamepad-controls">
+            <div class="control-hint">
+                <span class="control-button">A</span> 确认
+            </div>
+            <div class="control-hint">
+                <span class="control-button">B</span> 返回
+            </div>
+            <div class="control-hint">
+                <span class="control-button">X</span> 射击
+            </div>
+            <div class="control-hint">
+                <span class="control-button">Start</span> 暂停
+            </div>
+            <div class="control-hint">
+                <span class="control-button">🕹️</span> 移动
+            </div>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div id="gameOverScreen" class="ui-overlay screen">
+            <h2>游戏结束</h2>
+            <div id="finalScore">得分: 0</div>
+            <div id="newRecord" style="display: none; color: #ffff00; font-size: 1.5em; margin-bottom: 20px;">
+                🏆 新纪录！
+            </div>
+            <div id="leaderboard">
+                <h3 style="text-align: center; margin-bottom: 15px; color: #00ffff;">排行榜</h3>
+                <div id="leaderboardList"></div>
+            </div>
+            <button id="restartButton" class="menu-button">重新开始</button>
+            <button id="mainMenuButton" class="menu-button">返回主菜单</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
