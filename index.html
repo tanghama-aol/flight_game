@@ -49,6 +49,8 @@
             align-items: center;
             text-align: center;
             z-index: 20;
+            position: relative;
+            cursor: default;
         }
 
         #gameTitle {
@@ -121,6 +123,7 @@
             align-items: center;
             text-align: center;
             z-index: 20;
+            cursor: default;
         }
 
         #finalScore {
@@ -178,11 +181,11 @@
         #instructions {
             position: absolute;
             bottom: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
+            right: 50px;
+            text-align: left;
             color: #cccccc;
             font-size: 1em;
+            max-width: 350px;
         }
 
         .instruction-line {
@@ -264,7 +267,7 @@
 
         .gamepad-controls {
             position: absolute;
-            bottom: 20px;
+            top: 80px;
             right: 20px;
             background: rgba(0, 0, 0, 0.7);
             border: 1px solid #00ffff;
@@ -305,16 +308,21 @@
         <div id="startScreen" class="ui-overlay screen active">
             <h1 id="gameTitle">弹幕大战</h1>
             <h2 id="gameSubtitle">星际穿越</h2>
-            <button id="startButton" class="menu-button">开始游戏</button>
+            <button id="singlePlayerButton" class="menu-button">单人模式</button>
+            <button id="coopPlayerButton" class="menu-button">双人合作</button>
             <button id="leaderboardButton" class="menu-button">排行榜</button>
             <button id="instructionsButton" class="menu-button">游戏说明</button>
             <button id="gamepadSettingsButton" class="menu-button" style="display: none;">🎮 手柄设置</button>
             
             <div id="instructions">
                 <div class="instruction-section">
-                    <div class="instruction-title">⌨️ 键盘/鼠标操作</div>
-                    <div class="instruction-line">🎮 使用 WASD 或方向键移动飞机</div>
-                    <div class="instruction-line">🔫 按住空格键或点击鼠标射击</div>
+                    <div class="instruction-title">⌨️ 键盘操作</div>
+                    <div class="instruction-line">🎮 玩家1: WASD键移动飞机</div>
+                    <div class="instruction-line">🎮 玩家2: 方向键移动飞机</div>
+                    <div class="instruction-line">🔫 玩家1: 空格键射击</div>
+                    <div class="instruction-line">🔫 玩家2: 回车键射击</div>
+                    <div class="instruction-line">💣 玩家1: Shift键释放大雷</div>
+                    <div class="instruction-line">💣 玩家2: Ctrl键释放大雷</div>
                     <div class="instruction-line">⏸️ 按 ESC 或 P 键暂停游戏</div>
                 </div>
                 
@@ -322,6 +330,7 @@
                     <div class="instruction-title">🎮 手柄操作</div>
                     <div class="instruction-line">🕹️ 左摇杆或方向键移动飞机</div>
                     <div class="instruction-line">🔫 X/Square 或 扳机键射击</div>
+                    <div class="instruction-line">💣 Y/Triangle 键释放大雷</div>
                     <div class="instruction-line">⏸️ Start/Options 键暂停游戏</div>
                     <div class="instruction-line">🎯 A/Cross 键确认，B/Circle 键返回</div>
                     <div class="instruction-line">📳 支持震动反馈效果</div>
@@ -329,6 +338,8 @@
                 
                 <div class="instruction-section">
                     <div class="instruction-line">💎 收集道具获得强化</div>
+                    <div class="instruction-line">💣 大雷清除屏幕敌人</div>
+                    <div class="instruction-line">🔥 增强效果持续到被击中</div>
                     <div class="instruction-line">⭐ 击败敌机获得分数</div>
                 </div>
             </div>
