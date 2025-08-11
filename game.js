@@ -2123,7 +2123,7 @@ class Enemy {
             case 'single':
                 game.enemyBullets.push(new Bullet(
                     this.x, this.y + this.radius,
-                    0, 200, 
+                    0, 120, // 降低速度从200到120
                     { type: 'basic', level: 1, isPlayer: false }
                 ));
                 break;
@@ -2133,8 +2133,8 @@ class Enemy {
                 angles.forEach(angle => {
                     game.enemyBullets.push(new Bullet(
                         this.x, this.y + this.radius,
-                        Math.sin(angle) * 150,
-                        Math.cos(angle) * 150 + 100,
+                        Math.sin(angle) * 100, // 降低速度从150到100
+                        Math.cos(angle) * 100 + 80, // 降低速度从150+100到100+80
                         { type: 'scatter', level: 1, isPlayer: false }
                     ));
                 });
@@ -2162,7 +2162,7 @@ class Enemy {
                     const dx = targetPlayer.x - this.x;
                     const dy = targetPlayer.y - this.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    const speed = 200;
+                    const speed = 140; // 降低速度从200到140
                     
                     game.enemyBullets.push(new Bullet(
                         this.x, this.y + this.radius,
@@ -2177,7 +2177,7 @@ class Enemy {
                 const bulletCount = 8;
                 for (let i = 0; i < bulletCount; i++) {
                     const angle = (i * Math.PI * 2) / bulletCount;
-                    const speed = 120;
+                    const speed = 80; // 降低速度从120到80
                     
                     game.enemyBullets.push(new Bullet(
                         this.x, this.y + this.radius,
@@ -2229,7 +2229,7 @@ class Enemy {
         
         for (let i = 0; i < angleCount; i++) {
             const angle = baseAngle + angleStep * i;
-            const speed = 180 + Math.random() * 40;
+            const speed = 120 + Math.random() * 30; // 降低速度从180+40到120+30
             
             game.enemyBullets.push(new Bullet(
                 this.x, this.y + this.radius,
@@ -2247,7 +2247,7 @@ class Enemy {
         
         for (let i = 0; i < bulletCount; i++) {
             const angle = (i * Math.PI * 2) / bulletCount + rotationSpeed;
-            const speed = 120;
+            const speed = 80; // 降低速度从120到80
             
             game.enemyBullets.push(new Bullet(
                 this.x, this.y + this.radius,
@@ -2268,7 +2268,7 @@ class Enemy {
             for (let bullet = 0; bullet < bulletPerSpiral; bullet++) {
                 const angle = (spiral * Math.PI * 2 / spiralCount) + 
                              (bullet * 0.3) + rotationOffset;
-                const speed = 140 + bullet * 30;
+                const speed = 90 + bullet * 20; // 降低速度从140+30到90+20
                 
                 game.enemyBullets.push(new Bullet(
                     this.x, this.y + this.radius,
@@ -2305,7 +2305,7 @@ class Enemy {
                 const dy = targetPlayer.y - this.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 const spread = (i - 2) * 0.15; // -0.3 到 0.3 的扩散
-                const speed = 200;
+                const speed = 130; // 降低速度从200到130
                 
                 game.enemyBullets.push(new Bullet(
                     this.x, this.y + this.radius,
@@ -2323,7 +2323,7 @@ class Enemy {
         
         for (let i = 0; i < burstCount; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const speed = 100 + Math.random() * 80;
+            const speed = 70 + Math.random() * 50; // 降低速度从100+80到70+50
             
             game.enemyBullets.push(new Bullet(
                 this.x + (Math.random() - 0.5) * this.radius,
